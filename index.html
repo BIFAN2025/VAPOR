@@ -168,8 +168,15 @@
             document.getElementById('next').onclick = function() { player.nextVideo(); };
             // Volume controls
             document.getElementById('vol-up').onclick = function() {
+              player.unMute();
               let v = player.getVolume();
               v = Math.min(v + 10, 100);
+              player.setVolume(v);
+            };
+            document.getElementById('vol-down').onclick = function() {
+              player.unMute();
+              let v = player.getVolume();
+              v = Math.max(v - 10, 0);
               player.setVolume(v);
             };
             document.getElementById('vol-down').onclick = function() {
