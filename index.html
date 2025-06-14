@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Vaporwave Synthwave Site with Chat</title>
+  <title>My Vaporwave Synthwave Site with Chat & Game</title>
   <!-- Pixel Font -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    /* @font-face for 모리스_9 (폰트 파일을 fonts/모리스_9.woff2 경로에 업로드해야 합니다) */
-    @font-face {
-      font-family: '모리스체-heroine762';
-      src: url('fonts/모리스체-heroine762.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body {
-      width:100%; height:100%; overflow-y:auto; background:#000;
-      font-family:'Press Start 2P',monospace; position:relative;
+      width: 100%;
+      /* allow content to define height */
+      height: auto;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: #000;
+      font-family: 'Press Start 2P', monospace;
+      position: relative;
     }
     /* Grid background */
     .bg {
@@ -75,17 +75,18 @@
       transition:.2s;
     }
     .control-btn:hover { background:#00ffff; transform:scale(1.1); color:#121212; }
-    #chat {
-      height:25vh; max-height:200px; overflow-y:auto;
-      background:rgba(0,0,0,.7); margin:1rem 0; padding:1rem;
-      /* 채팅 전용 한글 폰트 모리스체-heroine762 사용 */
-      font-family:'모리스체-heroine762', 'Press Start 2P', monospace;
+    #chat { height:150px; overflow-y:auto; background:rgba(0,0,0,.7);
+      margin:1rem 0; padding:1rem; font-family:'모리스체-heroine762','Press Start 2P',monospace;
       font-size:1rem; color:#fff; border:2px solid #00ffff;
       animation:rainbowText 5s linear infinite;
     }
     @keyframes rainbowText {0%{color:red;}16%{color:orange;}32%{color:yellow;}48%{color:green;}64%{color:blue;}80%{color:indigo;}100%{color:violet;}}
     #chat-input { width:60%; padding:.6rem; font-size:.6rem; margin:.5rem .5rem; }
     #send-btn { padding:.6rem 1.2rem; font-size:.6rem; }
+    /* Mini Game */
+    #game-container { margin-top:1rem; }
+    #gameCanvas { background:#000; display:block; margin:0 auto; border:2px solid #00ffff; }
+    #gameScore { font-size:.75rem; color:#ff79c6; }
     .fallback { font-size:.6rem; color:#ff79c6; }
     .fallback a { color:#00ffff; text-decoration:underline; }
   </style>
@@ -104,93 +105,61 @@
       <div id="player"></div>
       <div><button class="control-btn" id="prev">◀︎ Prev</button><button class="control-btn" id="play">Play</button><button class="control-btn" id="next">Next ▶︎</button></div>
       <div id="chat"></div>
-      <input id="chat-input" type="text" placeholder="チャットを入力..." />
+      <input id="chat-input" type="text" placeholder="チャット를 입력..." />
       <button id="send-btn" class="control-btn">送信</button>
       <p class="fallback">埋め込みがブロックされた場合は <a href="https://www.youtube.com/watch?v=WI4-HUn8dFc&list=PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk" target="_blank">こちら</a> をクリック</p>
+      <!-- Mini Game: Catch the Star -->
+      <div id="game-container">
+        <h2 style="font-size:1rem;color:#ff79c6;">⭐ Catch the Star Game ⭐</h2>
+        <p style="font-size:.75rem;color:#00ffff;">Click the moving star as many times as you can!</p>
+        <canvas id="gameCanvas" width="300" height="200"></canvas>
+        <p id="gameScore">Score: 0</p>
+      </div>
     </div>
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const chatBox = document.getElementById('chat');
-      // Twinkle background stars
+      // Twinkle stars
       setInterval(() => {
-        const t = document.createElement('div'); t.className = 'twinkle';
-        const sz = Math.random() * 4 + 2; t.style.width = sz + 'px'; t.style.height = sz + 'px';
-        t.style.left = Math.random() * 100 + '%'; t.style.top = Math.random() * 100 + '%';
-        document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
-      }, 150);
+        const t = document.createElement('div'); t.className='twinkle';
+        const sz=Math.random()*4+2; t.style.width=sz+'px'; t.style.height=sz+'px';
+        t.style.left=Math.random()*100+'%'; t.style.top=Math.random()*100+'%';
+        document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+      },150);
       // Floating stars in chat
       setInterval(() => {
-        const s = document.createElement('div'); s.className = 'floating-star'; s.innerText = '★';
-        const rect = chatBox.getBoundingClientRect();
-        s.style.left = Math.random() * (rect.width - 24) + 'px';
-        s.style.top = rect.height + 'px';
-        chatBox.appendChild(s); s.addEventListener('animationend', () => s.remove());
-      }, 250);
+        const s=document.createElement('div'); s.className='floating-star'; s.innerText='★';
+        const rect=chatBox.getBoundingClientRect();
+        s.style.left=Math.random()*(rect.width-24)+'px'; s.style.top=rect.height+'px';
+        s.style.animationDelay=(Math.random()*4)+'s';
+        chatBox.appendChild(s); s.addEventListener('animationend',()=>s.remove());
+      },250);
       // Firebase init and chat
-      const config = {
-        apiKey: "AIzaSyCcNEZGmBSH3U_RlvmAOXYFHbW7dzzbFDE",
-        authDomain: "vapor-71b36.firebaseapp.com",
-        databaseURL: "https://vapor-71b36-default-rtdb.firebaseio.com/",
-        projectId: "vapor-71b36",
-        storageBucket: "vapor-71b36.appspot.com",
-        messagingSenderId: "344956365850",
-        appId: "1:344956365850:web:51ca717cc8dda9838bb5a3"
-      };
+      const config={apiKey:"AIzaSyCcNEZGmBSH3U_RlvmAOXYFHbW7dzzbFDE",authDomain:"vapor-71b36.firebaseapp.com",databaseURL:"https://vapor-71b36-default-rtdb.firebaseio.com/",projectId:"vapor-71b36",storageBucket:"vapor-71b36.appspot.com",messagingSenderId:"344956365850",appId:"1:344956365850:web:51ca717cc8dda9838bb5a3"};
       firebase.initializeApp(config);
-      const db = firebase.database().ref('chat');
-      db.on('child_added', snap => {
-        const m = snap.val();
-        const d = document.createElement('div');
-        d.textContent = m;
-        chatBox.appendChild(d);
-        chatBox.scrollTop = chatBox.scrollHeight;
+      const db=firebase.database().ref('chat');
+      db.on('child_added',snap=>{const m=snap.val();const d=document.createElement('div');d.textContent=m;chatBox.appendChild(d);chatBox.scrollTop=chatBox.scrollHeight;});
+      document.getElementById('send-btn').addEventListener('click',()=>{
+        const v=document.getElementById('chat-input').value.trim();if(v){db.push(v);}document.getElementById('chat-input').value='';
       });
-      document.getElementById('send-btn').addEventListener('click', () => {
-        const input = document.getElementById('chat-input');
-        const v = input.value.trim();
-        if (!v) return;
-        db.push(v);
-        input.value = '';
-      });
-      // Enter 키로 채팅 전송
-      document.getElementById('chat-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          document.getElementById('send-btn').click();
-        }
-      });
+      document.getElementById('chat-input').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('send-btn').click(); });
       // YouTube IFrame API load
-      const ytTag = document.createElement('script');
-      ytTag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(ytTag);
+      const ytTag=document.createElement('script'); ytTag.src='https://www.youtube.com/iframe_api'; document.head.appendChild(ytTag);
     });
-    
+    // YouTube player and controls
     let player;
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        playerVars: {
-          listType: 'playlist',
-          list: 'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',
-          autoplay: 0,
-          controls: 0,
-          loop: 1,
-          modestbranding: 1,
-          origin: location.origin
-        },
-        events: {
-          onReady: function() {
-            const playBtn = document.getElementById('play');
-            const prevBtn = document.getElementById('prev');
-            const nextBtn = document.getElementById('next');
-            playBtn.addEventListener('click', () => {
-              const state = player.getPlayerState();
-              if (state === YT.PlayerState.PLAYING) player.pauseVideo();
-              else player.playVideo();
-            });
-            prevBtn.addEventListener('click', () => player.previousVideo());
-            nextBtn.addEventListener('click', () => player.nextVideo());
-          }
-        }
-      });
+    function onYouTubeIframeAPIReady(){
+      player=new YT.Player('player',{playerVars:{listType:'playlist',list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',autoplay:0,controls:0,loop:1,modestbranding:1,origin:location.origin},events:{onReady:function(){document.getElementById('play').onclick=()=>{const s=player.getPlayerState();s===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();};document.getElementById('prev').onclick=()=>player.previousVideo();document.getElementById('next').onclick=()=>player.nextVideo();}}});
     }
+    // Mini Game logic
+    document.addEventListener('DOMContentLoaded',()=>{
+      const canvas=document.getElementById('gameCanvas');const ctx=canvas.getContext('2d');const scoreDisplay=document.getElementById('gameScore');let score=0;let star={x:0,y:0,r:10};
+      function drawStar(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#ff79c6';ctx.beginPath();ctx.moveTo(star.x,star.y-star.r);for(let i=1;i<5;i++){const angle=i*(Math.PI*2)/5-Math.PI/2;ctx.lineTo(star.x+Math.cos(angle)*star.r,star.y+Math.sin(angle)*star.r);}ctx.closePath();ctx.fill();}
+      function placeStar(){star.x=Math.random()*(canvas.width-2*star.r)+star.r;star.y=Math.random()*(canvas.height-2*star.r)+star.r;drawStar();}
+      canvas.addEventListener('click',e=>{const rect=canvas.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;const dx=mx-star.x,dy=my-star.y;if(Math.sqrt(dx*dx+dy*dy)<star.r){score++;scoreDisplay.textContent='Score: '+score;placeStar();}});
+      placeStar();setInterval(placeStar,2000);
+    });
   </script>
+</body>
+</html>
