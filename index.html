@@ -10,6 +10,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
+    /* @font-face for 모리스_9 (폰트 파일을 fonts/모리스_9.woff2 경로에 업로드해야 합니다) */
+    @font-face {
+      font-family: '모리스체-heroine762';
+      src: url('fonts/모리스체-heroine762.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body {
       width:100%; height:100%; overflow-y:auto; background:#000;
@@ -68,8 +75,11 @@
       transition:.2s;
     }
     .control-btn:hover { background:#00ffff; transform:scale(1.1); color:#121212; }
-    #chat { height:150px; overflow-y:auto; background:rgba(0,0,0,.7);
-      margin:1rem 0; padding:1rem; font-family:'Press Start 2P',monospace;
+    #chat {
+      height:25vh; max-height:200px; overflow-y:auto;
+      background:rgba(0,0,0,.7); margin:1rem 0; padding:1rem;
+      /* 채팅 전용 한글 폰트 모리스체-heroine762 사용 */
+      font-family:'모리스체-heroine762', 'Press Start 2P', monospace;
       font-size:1rem; color:#fff; border:2px solid #00ffff;
       animation:rainbowText 5s linear infinite;
     }
@@ -137,11 +147,17 @@
         chatBox.scrollTop = chatBox.scrollHeight;
       });
       document.getElementById('send-btn').addEventListener('click', () => {
-        const v = document.getElementById('chat-input').value.trim();
-        if (v) {
-          db.push(v);
+        const input = document.getElementById('chat-input');
+        const v = input.value.trim();
+        if (!v) return;
+        db.push(v);
+        input.value = '';
+      });
+      // Enter 키로 채팅 전송
+      document.getElementById('chat-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('send-btn').click();
         }
-        document.getElementById('chat-input').value = '';
       });
       // YouTube IFrame API load
       const ytTag = document.createElement('script');
