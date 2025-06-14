@@ -12,14 +12,17 @@
   <style>
     /* Reset */
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:'Press Start 2P',monospace; position:relative; cursor:auto; }
+    html, body { width:100%; height:100%; overflow:auto; background:#000; font-family:'Press Start 2P',monospace; position:relative; cursor:auto; }
     /* Full-cover background */
     .bg { position:absolute; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg,#2b0a3d,#7f0a9e 50%,#ff79c6); background-size:cover; z-index:1; }
     /* Neon lines */
     .neon { position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:repeating-linear-gradient(45deg,rgba(0,255,255,0.15)0,transparent20px),repeating-linear-gradient(-45deg,rgba(255,0,255,0.15)0,transparent20px); animation:neonFlicker 3s infinite; z-index:2; }
     @keyframes neonFlicker {0%,100%{opacity:.4;}50%{opacity:.1;}}
+    /* Twinkle background stars */
+    .twinkle { position:absolute; background:#fff; border-radius:50%; opacity:0; animation:twinkleAnim 2s ease-in-out infinite; }
+    @keyframes twinkleAnim { 0%,100%{opacity:0;}50%{opacity:0.8;} }
     /* Floating stars */
-    .floating-star { position:absolute; color:white; font-size:4vw; opacity:0; animation:starRise 4s linear forwards, starColor 2s linear infinite; z-index:3; }
+    .floating-star { position:absolute; font-size:4vw; opacity:0; animation:starRise 4s linear forwards, starColor 2s linear infinite; z-index:3; }
     @keyframes starRise {0%{transform:translateY(100vh) scale(.5);opacity:1;}100%{transform:translateY(-10vh) scale(1);opacity:0;}}
     @keyframes starColor {0%{color:red;}16%{color:orange;}32%{color:yellow;}48%{color:green;}64%{color:blue;}80%{color:indigo;}100%{color:violet;}}
     /* XP Window */
@@ -33,13 +36,11 @@
     @keyframes textFlicker {0%,100%{opacity:1;}50%{opacity:.5;text-shadow:0 0 10px #00ffff;}}
     h1 { margin-bottom:1vw; }
     p { font-size:3vw; max-font-size:.75rem; color:#00ffff; text-shadow:0 0 5px #00ffff; margin:1vw 0 .5vw; }
-    /* Video & Controls */
     #player { width:100%; aspect-ratio:16/9; border:2px solid #00ffff; border-radius:1vw; margin:.5vw 0; }
     .control-btn { margin:2vw 1vw; padding:2vw 4vw; font-size:2vw; max-font-size:.6rem; background:#ff79c6; border:2px solid #00ffff; border-radius:4vw; color:#000; cursor:pointer; transition:.2s; }
     .control-btn:hover { background:#00ffff; transform:scale(1.1); color:#121212; }
     /* Chat */
-    #chat { height:25vh; max-height:200px; overflow-y:auto; background:rgba(0,0,0,.7); margin:2vw 0; padding:2vw; font-family:'Press Start 2P',monospace; font-size:5vw; max-font-size:1rem; color:#fff; border:2px solid #00ffff; animation: rainbowText 5s linear infinite; }
-    @keyframes rainbowText { 0%{color:red;}16%{color:orange;}32%{color:yellow;}48%{color:green;}64%{color:blue;}80%{color:indigo;}100%{color:violet;} }
+    #chat { height:25vh; max-height:200px; overflow-y:auto; background:rgba(0,0,0,.7); margin:2vw 0; padding:2vw; font-family:'Press Start 2P',monospace; font-size:5vw; max-font-size:1rem; color:#fff; border:2px solid #00ffff; }
     #chat-input { width:65%; padding:2vw; font-size:5vw; max-font-size:1rem; margin:1vw 1vw; }
     #send-btn { padding:2vw 4vw; font-size:5vw; max-font-size:1rem; }
     .fallback { font-size:3vw; max-font-size:.75rem; color:#ff79c6; margin-top:1vw; }
@@ -50,8 +51,27 @@
 <body>
   <div class="bg"></div>
   <div class="neon"></div>
-  <!-- Floating Stars -->
-  <script>setInterval(() => {const s=document.createElement('div');s.className='floating-star';s.innerText='★';s.style.left=Math.random()*90+'%';document.body.appendChild(s);s.addEventListener('animationend',()=>s.remove());},200);</script>
+  <!-- Twinkle Background Stars -->
+  <script>
+    setInterval(() => {
+      const t = document.createElement('div');
+      t.className = 'twinkle';
+      const size = Math.random()*3 + 1;
+      t.style.width = size + 'px'; t.style.height = size + 'px';
+      t.style.left = Math.random()*100 + '%'; t.style.top = Math.random()*100 + '%';
+      document.body.appendChild(t);
+      // remove after animation cycle
+      setTimeout(() => t.remove(), 2000);
+    }, 200);
+    // Floating Stars
+    setInterval(() => {
+      const s = document.createElement('div');
+      s.className = 'floating-star'; s.innerText = '★';
+      s.style.left = Math.random()*90 + '%';
+      document.body.appendChild(s);
+      s.addEventListener('animationend', () => s.remove());
+    }, 200);
+  </script>
   <div class="window">
     <div class="title-bar"><span>Vaporwave Player</span><div class="buttons"><div class="btn-xp"></div><div class="btn-xp"></div><div class="btn-xp"></div></div></div>
     <div class="content">
@@ -66,15 +86,21 @@
     </div>
   </div>
   <script>
-    // YouTube API
-    const ytTag=document.createElement('script');ytTag.src='https://www.youtube.com/iframe_api';document.head.appendChild(ytTag);
+    const ytTag = document.createElement('script'); ytTag.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(ytTag);
     let player;
-    function onYouTubeIframeAPIReady(){player=new YT.Player('player',{playerVars:{listType:'playlist',list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',autoplay:0,controls:0,loop:1,modestbranding:1,origin:location.origin}})}
-    document.addEventListener('DOMContentLoaded',()=>{document.getElementById('play').onclick=()=>{const s=player.getPlayerState();s===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();};document.getElementById('prev').onclick=()=>player.previousVideo();document.getElementById('next').onclick=()=>player.nextVideo();
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', { playerVars: { listType:'playlist', list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk', autoplay:0, controls:0, loop:1, modestbranding:1, origin:location.origin } });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('play').onclick = () => { const s = player.getPlayerState(); s === YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo(); };
+      document.getElementById('prev').onclick = () => player.previousVideo();
+      document.getElementById('next').onclick = () => player.nextVideo();
       // Firebase init
-      const config={apiKey:"AIzaSyCcNEZGmBSH3U_RlvmAOXYFHbW7dzzbFDE",authDomain:"vapor-71b36.firebaseapp.com",databaseURL:"https://vapor-71b36-default-rtdb.firebaseio.com",projectId:"vapor-71b36",storageBucket:"vapor-71b36.appspot.com",messagingSenderId:"344956365850",appId:"1:344956365850:web:51ca717cc8dda9838bb5a3"};firebase.initializeApp(config);
-      const db=firebase.database().ref('chat');db.on('child_added',snap=>{const m=snap.val();const d=document.createElement('div');d.textContent=m;document.getElementById('chat').appendChild(d);document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight;});
-      document.getElementById('send-btn').onclick=()=>{const v=document.getElementById('chat-input').value;if(v){db.push(v);document.getElementById('chat-input').value='';}};
+      const config = { apiKey:"AIzaSyCcNEZGmBSH3U_RlvmAOXYFHbW7dzzbFDE", authDomain:"vapor-71b36.firebaseapp.com", databaseURL:"https://vapor-71b36-default-rtdb.firebaseio.com", projectId:"vapor-71b36", storageBucket:"vapor-71b36.appspot.com", messagingSenderId:"344956365850", appId:"1:344956365850:web:51ca717cc8dda9838bb5a3" };
+      firebase.initializeApp(config);
+      const db = firebase.database().ref('chat');
+      db.on('child_added', snap => { const m = snap.val(); const d = document.createElement('div'); d.textContent = m; document.getElementById('chat').appendChild(d); document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; });
+      document.getElementById('send-btn').onclick = () => { const v = document.getElementById('chat-input').value; if (v) { db.push(v); document.getElementById('chat-input').value = ''; } };
     });
   </script>
 </body>
