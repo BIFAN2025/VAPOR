@@ -107,6 +107,11 @@
       <div id="chat"></div>
       <input id="chat-input" type="text" placeholder="チャット를 입력..." />
       <button id="send-btn" class="control-btn">送信</button>
+      <!-- Search song -->
+      <div style="margin-top:1rem;">
+        <input id="search-input" type="text" placeholder="Search song..." style="padding:.6rem; font-size:.6rem; width:60%;" />
+        <button id="search-btn" class="control-btn">검색</button>
+      </div>
       <p class="fallback">埋め込みがブロックされた場合は <a href="https://www.youtube.com/watch?v=WI4-HUn8dFc&list=PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk" target="_blank">こちら</a> をクリック</p>
       <!-- Mini Game: Catch the Star -->
       <div id="game-container">
@@ -162,7 +167,7 @@
         },
         events: {
           onReady: function() {
-            player.mute();
+            player.setVolume(100); // 최대 음량 설정
             player.playVideo();
             document.getElementById('play').onclick = function() {
               const state = player.getPlayerState();
