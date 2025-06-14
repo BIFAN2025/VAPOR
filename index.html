@@ -102,30 +102,79 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const chatBox = document.getElementById('chat');
-      // Twinkle stars
+      // Twinkle background stars
       setInterval(() => {
-        const t = document.createElement('div'); t.className='twinkle';
-        const sz=Math.random()*3+1; t.style.width=sz+'px'; t.style.height=sz+'px';
-        t.style.left=Math.random()*100+'%'; t.style.top=Math.random()*100+'%';
-        document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
-      },150);
+        const t = document.createElement('div'); t.className = 'twinkle';
+        const sz = Math.random() * 4 + 2; t.style.width = sz + 'px'; t.style.height = sz + 'px';
+        t.style.left = Math.random() * 100 + '%'; t.style.top = Math.random() * 100 + '%';
+        document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
+      }, 150);
       // Floating stars in chat
       setInterval(() => {
-        const s = document.createElement('div'); s.className='floating-star'; s.innerText='★';
-        const rect=chatBox.getBoundingClientRect();
-        s.style.left=Math.random()*(rect.width-24)+'px'; s.style.top=rect.height+'px';
-        chatBox.appendChild(s); s.addEventListener('animationend',()=>s.remove());
-      },250);
+        const s = document.createElement('div'); s.className = 'floating-star'; s.innerText = '★';
+        const rect = chatBox.getBoundingClientRect();
+        s.style.left = Math.random() * (rect.width - 24) + 'px';
+        s.style.top = rect.height + 'px';
+        chatBox.appendChild(s); s.addEventListener('animationend', () => s.remove());
+      }, 250);
       // Firebase init and chat
-      const config={apiKey:"AIzaSyCcNEZGmBSH3U_RlvmAOXYFHbW7dzzbFDE",authDomain:"vapor-71b36.firebaseapp.com",databaseURL:"https://vapor-71b36-default-rtdb.firebaseio.com/",projectId:"vapor-71b36",storageBucket:"vapor-71b36.appspot.com",messagingSenderId:"344956365850",appId:"1:344956365850:web:51ca717cc8dda9838bb5a3"};
+      const config = {
+        apiKey: "AIzaSyCcNEZGmBSH3U_RlvmAOXYFHbW7dzzbFDE",
+        authDomain: "vapor-71b36.firebaseapp.com",
+        databaseURL: "https://vapor-71b36-default-rtdb.firebaseio.com/",
+        projectId: "vapor-71b36",
+        storageBucket: "vapor-71b36.appspot.com",
+        messagingSenderId: "344956365850",
+        appId: "1:344956365850:web:51ca717cc8dda9838bb5a3"
+      };
       firebase.initializeApp(config);
-      const db=firebase.database().ref('chat');
-      db.on('child_added',snap=>{const m=snap.val();const d=document.createElement('div');d.textContent=m;chatBox.appendChild(d);chatBox.scrollTop=chatBox.scrollHeight;});
-      document.getElementById('send-btn').addEventListener('click',()=>{const v=document.getElementById('chat-input').value.trim();if(v){db.push(v);}document.getElementById('chat-input').value='';});
-      // YouTube API
-      const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
+      const db = firebase.database().ref('chat');
+      db.on('child_added', snap => {
+        const m = snap.val();
+        const d = document.createElement('div');
+        d.textContent = m;
+        chatBox.appendChild(d);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+      document.getElementById('send-btn').addEventListener('click', () => {
+        const v = document.getElementById('chat-input').value.trim();
+        if (v) {
+          db.push(v);
+        }
+        document.getElementById('chat-input').value = '';
+      });
+      // YouTube IFrame API load
+      const ytTag = document.createElement('script');
+      ytTag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(ytTag);
     });
-    function onYouTubeIframeAPIReady(){window.player=new YT.Player('player',{playerVars:{listType:'playlist',list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',autoplay:0,controls:0,loop:1,modestbranding:1,origin:location.origin}});}    
+    
+    let player;
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        playerVars: {
+          listType: 'playlist',
+          list: 'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',
+          autoplay: 0,
+          controls: 0,
+          loop: 1,
+          modestbranding: 1,
+          origin: location.origin
+        },
+        events: {
+          onReady: function() {
+            const playBtn = document.getElementById('play');
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+            playBtn.addEventListener('click', () => {
+              const state = player.getPlayerState();
+              if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+              else player.playVideo();
+            });
+            prevBtn.addEventListener('click', () => player.previousVideo());
+            nextBtn.addEventListener('click', () => player.nextVideo());
+          }
+        }
+      });
+    }
   </script>
-</body>
-</html>
