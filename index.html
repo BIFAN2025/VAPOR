@@ -4,14 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Vaporwave Synthwave Site</title>
-  <!-- 루트 경로 접속 시 vapor.html로 리다이렉트 -->
-  <script>
-    if (!window.location.pathname.includes('.html')) {
-      window.location.href = window.location.pathname + 'vapor.html';
-    }
-  </script>
   <!-- Pixel Font 추가 -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- 루트 URL 접속 시 페이지 로드 보장을 위해 파일명을 index.html로 사용 -->
   <style>
     /* 기본 리셋 */
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -45,29 +40,19 @@
       background: radial-gradient(circle at center, rgba(255,255,255,0.1), transparent 70%);
       transform: translate(-50%, -50%);
     }
-    @keyframes gridMove {
-      0% { background-position:0 0; }
-      100% { background-position:100% 100%; }
-    }
+    @keyframes gridMove { 0% { background-position:0 0; } 100% { background-position:100% 100%; } }
     /* 네온 라인 */
     .neon {
-      position:absolute;
-      width:200%; height:200%;
-      top:-50%; left:-50%;
-      background:
-        repeating-linear-gradient(45deg, rgba(0,255,255,0.2), rgba(0,255,255,0.2) 1px, transparent 1px, transparent 20px),
-        repeating-linear-gradient(-45deg, rgba(255,0,255,0.2), rgba(255,0,255,0.2) 1px, transparent 1px, transparent 20px);
+      position:absolute; width:200%; height:200%; top:-50%; left:-50%;
+      background: repeating-linear-gradient(45deg, rgba(0,255,255,0.2), rgba(0,255,255,0.2) 1px, transparent 1px, transparent 20px),
+                  repeating-linear-gradient(-45deg, rgba(255,0,255,0.2), rgba(255,0,255,0.2) 1px, transparent 1px, transparent 20px);
       animation: neonFlicker 3s infinite;
       z-index:2;
     }
-    @keyframes neonFlicker {
-      0%, 100% { opacity:0.4; }
-      50% { opacity:0.1; }
-    }
+    @keyframes neonFlicker { 0%,100% { opacity:0.4; } 50% { opacity:0.1; } }
     /* 떠다니는 하트 */
     .heart {
-      position:absolute;
-      width:24px; height:24px;
+      position:absolute; width:24px; height:24px;
       background:url('https://i.imgur.com/O6b4h6F.png') no-repeat center/contain;
       animation: floatUp 6s linear forwards;
       z-index:4;
@@ -79,74 +64,30 @@
     }
     /* XP 윈도우 스타일 */
     .window {
-      position:relative;
-      z-index:3;
-      width:600px;
-      background:#c0c0c0;
-      border:2px solid #fff;
-      box-shadow:4px 4px 0 #000;
+      position:relative; z-index:3; width:600px;
+      background:#c0c0c0; border:2px solid #fff; box-shadow:4px 4px 0 #000;
       font-family:'Press Start 2P', monospace;
     }
     .title-bar {
-      background:linear-gradient(to right, #000080, #0000cd);
-      color:#fff;
-      padding:4px 8px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+      background:linear-gradient(to right, #000080, #0000cd); color:#fff;
+      padding:4px 8px; display:flex; justify-content:space-between; align-items:center;
       border-bottom:2px solid #fff;
     }
     .title { font-size:0.75rem; }
     .buttons { display:flex; }
-    .btn-xp {
-      width:16px; height:16px;
-      margin-left:4px;
-      background:#ff5c5c;
-      border:1px solid #fff;
-      cursor:pointer;
-    }
-    .content {
-      padding:16px;
-      background:#008080;
-      border-top:2px solid #fff;
-    }
-    h1 {
-      font-size:1.25rem;
-      color:#ff79c6;
-      text-shadow: 0 0 5px #ff79c6, 0 0 10px #ff79c6;
-      margin-bottom:0.5rem;
-    }
-    p {
-      font-size:0.75rem;
-      color:#00ffff;
-      text-shadow: 0 0 5px #00ffff;
-      margin-bottom:1rem;
-    }
+    .btn-xp { width:16px; height:16px; margin-left:4px; background:#ff5c5c; border:1px solid #fff; cursor:pointer; }
+    .content { padding:16px; background:#008080; border-top:2px solid #fff; }
+    h1 { font-size:1.25rem; color:#ff79c6; text-shadow:0 0 5px #ff79c6,0 0 10px #ff79c6; margin-bottom:0.5rem; }
+    p { font-size:0.75rem; color:#00ffff; text-shadow:0 0 5px #00ffff; margin-bottom:1rem; }
     .control-btn {
-      margin:0.5rem;
-      padding:0.6rem 1.2rem;
-      font-size:0.6rem;
-      color:#000;
-      background:#ff79c6;
-      border:2px solid #00ffff;
-      border-radius:6px;
+      margin:0.5rem; padding:0.6rem 1.2rem; font-size:0.6rem;
+      color:#000; background:#ff79c6; border:2px solid #00ffff; border-radius:6px;
       transition: transform 0.2s, background 0.2s;
     }
-    .control-btn:hover {
-      background:#00ffff;
-      transform: scale(1.1);
-      color:#121212;
-    }
-    #player {
-      width:100%; height:315px;
-      border:2px solid #00ffff;
-      border-radius:4px;
-      margin:1rem 0;
-    }
+    .control-btn:hover { background:#00ffff; transform: scale(1.1); color:#121212; }
+    #player { width:100%; height:315px; border:2px solid #00ffff; border-radius:4px; margin:1rem 0; }
     .fallback {
-      font-size:0.6rem;
-      color:#ff79c6;
-      margin-top:8px;
+      font-size:0.6rem; color:#ff79c6; margin-top:8px;
     }
     .fallback a { color:#00ffff; text-decoration:underline; }
   </style>
@@ -191,9 +132,7 @@
       });
     }
     document.addEventListener('DOMContentLoaded',()=>{
-      document.getElementById('play').addEventListener('click',()=>{
-        player.getPlayerState()===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();
-      });
+      document.getElementById('play').addEventListener('click',()=>{player.getPlayerState()===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();});
       document.getElementById('prev').addEventListener('click',()=>player.previousVideo());
       document.getElementById('next').addEventListener('click',()=>player.nextVideo());
       // 하트 생성
@@ -205,6 +144,10 @@
         heart.addEventListener('animationend', () => heart.remove());
       }, 800);
     });
+  </script>
+  <!-- YouTube API 콜백 함수 -->
+  <script>
+    function onYouTubeIframeAPIReady() {}
   </script>
 </body>
 </html>
