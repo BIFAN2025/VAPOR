@@ -108,6 +108,8 @@
         <button class="control-btn" id="prev">◀︎ Prev</button>
         <button class="control-btn" id="play">Play</button>
         <button class="control-btn" id="next">Next ▶︎</button>
+        <button class="control-btn" id="vol-down">Vol -</button>
+        <button class="control-btn" id="vol-up">Vol +</button>
       </div>
       <div id="chat"></div>
       <input id="chat-input" type="text" placeholder="채팅을 입력..." />
@@ -154,7 +156,27 @@
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
         playerVars: { listType:'playlist', list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk', autoplay:1, controls:0, loop:1, modestbranding:1, origin:location.origin },
-        events: { onReady: function() { player.setVolume(100); player.playVideo(); document.getElementById('play').onclick = () => { const s = player.getPlayerState(); s===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo(); }; document.getElementById('prev').onclick = () => player.previousVideo(); document.getElementById('next').onclick = () => player.nextVideo(); } }
+        events: { onReady: function() {
+            player.mute();
+            player.playVideo();
+            document.getElementById('play').onclick = function() {
+              if (player.isMuted()) player.unMute();
+              const state = player.getPlayerState();
+              state === YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo();
+            };
+            document.getElementById('prev').onclick = function() { player.previousVideo(); };
+            document.getElementById('next').onclick = function() { player.nextVideo(); };
+            // Volume controls
+            document.getElementById('vol-up').onclick = function() {
+              let v = player.getVolume();
+              v = Math.min(v + 10, 100);
+              player.setVolume(v);
+            };
+            document.getElementById('vol-down').onclick = function() {
+              let v = player.getVolume();
+              v = Math.max(v - 10, 0);
+              player.setVolume(v);
+            };} }
       });
     }
     // Mini Game logic
