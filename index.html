@@ -3,165 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Vaporwave Synthwave Site</title>
-  <!-- Pixel Font 추가 -->
+  <title>My Vaporwave Synthwave Site with Chat</title>
+  <!-- Pixel Font -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    /* 커서 커스터마이징 */
-    body, .control-btn, .btn-xp {
-      cursor: url('https://i.pinimg.com/originals/de/41/f8/de41f832a88afc20d28157037b389f8c.gif') 16 16, auto;
-    }
-    body {
-      height:100vh;
-      overflow:hidden;
-      background:#000;
-      position:relative;
-      font-family:'Press Start 2P', monospace;
-    }
-    /* 기본 배경: 그리드 애니메이션 */
-    .bg {
-      position:absolute; top:0; left:0;
-      width:100%; height:100%;
-      background: linear-gradient(135deg, #2b0a3d, #7f0a9e 50%, #ff79c6);
-      animation: gridMove 12s linear infinite;
-      z-index:1;
-    }
-    @keyframes gridMove {
-      0% { background-position:0 0; }
-      100% { background-position:100% 100%; }
-    }
+    html, body { height:100vh; overflow:hidden; background:#000; font-family:'Press Start 2P', monospace; position:relative; cursor: url('https://i.pinimg.com/originals/de/41/f8/de41f832a88afc20d28157037b389f8c.gif') 16 16, auto !important; }
+    /* 배경 그리드 애니메 */
+    .bg { position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #2b0a3d, #7f0a9e 50%, #ff79c6); animation: gridMove 12s linear infinite; z-index:1; }
+    @keyframes gridMove { 0%{background-position:0 0;}100%{background-position:100% 100%;} }
     /* 네온 라인 */
-    .neon {
-      position:absolute; top:-50%; left:-50%; width:200%; height:200%;
-      background:
-        repeating-linear-gradient(45deg, rgba(0,255,255,0.2) 0, rgba(0,255,255,0.2) 1px, transparent 1px, transparent 20px),
-        repeating-linear-gradient(-45deg, rgba(255,0,255,0.2) 0, rgba(255,0,255,0.2) 1px, transparent 1px, transparent 20px);
-      animation: neonFlicker 3s infinite;
-      z-index:2;
-    }
-    @keyframes neonFlicker {
-      0%,100% { opacity:0.4; }
-      50% { opacity:0.1; }
-    }
-    /* 트윙클 별 (강한 반짝임) */
-    .star {
-      position:absolute;
-      background:#fff;
-      border-radius:50%;
-      opacity:0;
-      pointer-events:none;
-      animation: starTwinkle 1.5s ease-out forwards;
-      z-index:1;
-    }
-    @keyframes starTwinkle {
-      0% { opacity:0; transform: scale(0.2); }
-      30% { opacity:1; transform: scale(1); }
-      100% { opacity:0; transform: scale(0.2); }
-    }
+    .neon { position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: repeating-linear-gradient(45deg, rgba(0,255,255,0.2) 0, transparent 20px), repeating-linear-gradient(-45deg, rgba(255,0,255,0.2) 0, transparent 20px); animation: neonFlicker 3s infinite; z-index:2; }
+    @keyframes neonFlicker { 0%,100%{opacity:0.4;}50%{opacity:0.1;} }
+    /* 트윙클 별 */
+    .star { position:absolute; background:#fff; border-radius:50%; opacity:0; animation: starTwinkle 1.5s ease-out forwards; z-index:1; }
+    @keyframes starTwinkle { 0%{opacity:0;transform:scale(0.2);}30%{opacity:1;transform:scale(1);}100%{opacity:0;transform:scale(0.2);} }
     /* 플로팅 GIF */
-    .floating-gif {
-      position:absolute;
-      width:48px; height:48px;
-      background-position:center;
-      background-size:contain;
-      background-repeat:no-repeat;
-      animation: floatUp 6s linear forwards;
-      z-index:3;
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(100vh) scale(0.8); opacity:0; }
-      10% { opacity:1; }
-      100% { transform: translateY(-150px) scale(1.2); opacity:0; }
-    }
-    /* XP 스타일 윈도우 */
-    .window {
-      position:relative;
-      z-index:4;
-      width:600px;
-      margin:0 auto;
-      top:50%; transform: translateY(-50%);
-      background:#c0c0c0; border:2px solid #fff; box-shadow:4px 4px 0 #000;
-    }
-    .title-bar {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:4px 8px;
-      background: linear-gradient(to right, #000080, #0000cd);
-      color:#fff;
-      border-bottom:2px solid #fff;
-    }
-    .buttons .btn-xp {
-      width:16px; height:16px;
-      margin-left:4px;
-      background:#ff5c5c;
-      border:1px solid #fff;
-      cursor:pointer;
-    }
-    .content {
-      padding:16px;
-      background:#008080;
-      border-top:2px solid #fff;
-    }
-    h1 {
-      font-size:1.25rem;
-      color:#ff79c6;
-      text-shadow:0 0 5px #ff79c6, 0 0 10px #ff79c6;
-      margin-bottom:0.5rem;
-    }
-    p {
-      font-size:0.75rem;
-      color:#00ffff;
-      text-shadow:0 0 5px #00ffff;
-      margin-bottom:1rem;
-    }
-    .control-btn {
-      margin:0.5rem;
-      padding:0.6rem 1.2rem;
-      font-size:0.6rem;
-      background:#ff79c6;
-      border:2px solid #00ffff;
-      border-radius:6px;
-      color:#000;
-      cursor:pointer;
-      transition:0.2s;
-    }
-    .control-btn:hover {
-      background:#00ffff;
-      transform: scale(1.1);
-      color:#121212;
-    }
-    #player {
-      width:100%; height:315px;
-      border:2px solid #00ffff;
-      border-radius:4px;
-      margin:1rem 0;
-    }
-    .fallback {
-      font-size:0.6rem;
-      color:#ff79c6;
-    }
+    .floating-gif { position:absolute; width:48px; height:48px; background-position:center; background-size:contain; background-repeat:no-repeat; animation: floatUp 6s linear forwards; z-index:3; }
+    @keyframes floatUp { 0%{transform:translateY(100vh) scale(0.8);opacity:0;}10%{opacity:1;}100%{transform:translateY(-150px) scale(1.2);opacity:0;} }
+    /* XP 스타일 창 */
+    .window { position:relative; z-index:4; width:600px; margin:40px auto; background:#c0c0c0; border:2px solid #fff; box-shadow: 1px 1px 0 #000, -1px -1px 0 #808080; overflow:hidden; }
+    /* 버튼 배치 */
+    .title-bar { display:flex; justify-content:space-between; align-items:center; padding:4px 8px; background:linear-gradient(to right,#000080,#0000cd); color:#fff; border-bottom:2px solid #fff; }
+    .buttons { display:flex; flex-direction:row; gap:4px; }
+    .btn-xp { width:16px; height:16px; background:#ff5c5c; border:1px solid #fff; cursor:pointer; }
+    .content { padding:16px; background:#008080; border-top:2px solid #fff; text-align:center; }
+    h1 { font-size:1.25rem; color:#ff79c6; text-shadow:0 0 5px #ff79c6,0 0 10px #ff79c6; margin-bottom:0.5rem; }
+    /* 일본어 감성 문구 */
+    p { font-size:0.75rem; color:#00ffff; text-shadow:0 0 5px #00ffff; margin-bottom:1rem; }
+    /* 비주얼라이저 */
+    #visualizer { display:flex; justify-content:space-between; align-items:flex-end; height:50px; margin:1rem 0; }
+    .bar { width:4%; background:#ff79c6; transition:height 0.1s; }
+    /* 컨트롤 */
+    .control-btn { margin:0.5rem; padding:0.6rem 1.2rem; font-size:0.6rem; background:#ff79c6; border:2px solid #00ffff; border-radius:6px; color:#000; transition:0.2s; }
+    .control-btn:hover { background:#00ffff; transform:scale(1.1); color:#121212; }
+    #player { width:100%; height:315px; box-sizing:border-box; border:2px solid #00ffff; border-radius:4px; margin:1rem 0; }
+    .fallback { font-size:0.6rem; color:#ff79c6; }
     .fallback a { color:#00ffff; text-decoration:underline; }
+    /* 채팅 */
+    #chat { height:150px; overflow-y:auto; background:rgba(0,0,0,0.5); margin:1rem 0; padding:8px; text-align:left; font-size:0.6rem; color:#fff; border:1px solid #00ffff; }
+    #chat-input { width:calc(100% - 60px); padding:4px; font-family:inherit; font-size:0.6rem; }
+    #send-btn { padding:4px 8px; font-size:0.6rem; }
   </style>
 </head>
 <body>
   <div class="bg"></div>
   <div class="neon"></div>
-
-  <!-- 별 생성 -->
   <script>
-    setInterval(() => {
-      const star = document.createElement('div');
-      star.className = 'star';
-      const size = Math.random() * 4 + 2; // 2~6px
-      star.style.width = size + 'px';
-      star.style.height = size + 'px';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      document.body.appendChild(star);
-      star.addEventListener('animationend', () => star.remove());
-    }, 100);
+    setInterval(()=>{ const s=document.createElement('div'); s.className='star'; const sz=Math.random()*4+2; s.style.width=sz+'px'; s.style.height=sz+'px'; s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%'; document.body.appendChild(s); s.addEventListener('animationend',()=>s.remove()); },100);
   </script>
-
   <div class="window">
     <div class="title-bar">
       <span>Vaporwave Player</span>
@@ -169,40 +62,54 @@
     </div>
     <div class="content">
       <h1>Retro Music On XP</h1>
-      <p>시원한 네온과 글리치 감성을 즐겨보세요</p>
+      <p>涼しげなネオンとグリッチの幻想をお楽しみください</p>
+      <div id="visualizer"></div>
       <div id="player"></div>
       <div>
         <button class="control-btn" id="prev">◀︎ Prev</button>
         <button class="control-btn" id="play">Play</button>
         <button class="control-btn" id="next">Next ▶︎</button>
       </div>
-      <p class="fallback">임베딩 차단 시 <a href="https://www.youtube.com/watch?v=WI4-HUn8dFc&list=PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk" target="_blank">여기</a> 클릭</p>
+      <div id="chat"></div>
+      <input id="chat-input" type="text" placeholder="チャットを入力..." />
+      <button id="send-btn" class="control-btn">送信</button>
+      <p class="fallback">埋め込みがブロックされた場合は <a href="https://www.youtube.com/watch?v=WI4-HUn8dFc&list=PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk" target="_blank">こちら</a> をクリック</p>
     </div>
   </div>
-
-  <!-- 플로팅 GIF 생성 & YouTube API 설정 -->
   <script>
-    const gifs = [
-      'https://media.tenor.com/Uvw2ilLXmnYAAAAj/pixel-heart.gif',
-      'https://i.pinimg.com/originals/a9/9e/41/a99e419272b53630b5d5b178188a8900.gif',
-      'https://i.pinimg.com/originals/ea/9f/e2/ea9fe22ede2464b8aab30a4028a796a9.gif'
-    ];
-    const tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(tag);
-    let player;
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', { playerVars: { listType:'playlist', list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk', autoplay:0, controls:0, loop:1, modestbranding:1, origin:location.origin } });
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('play').onclick = () => { const s = player.getPlayerState(); s===YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo(); };
-      document.getElementById('prev').onclick = () => player.previousVideo();
-      document.getElementById('next').onclick = () => player.nextVideo();
-      setInterval(() => {
-        const el = document.createElement('div'); el.className = 'floating-gif';
-        el.style.left = Math.random() * 90 + '%';
-        el.style.backgroundImage = `url('${gifs[Math.floor(Math.random()*gifs.length)]}')`;
-        document.body.appendChild(el);
-        el.addEventListener('animationend', () => el.remove());
-      }, 800);
+    // GIF 플로팅
+    const gifs=['https://media.tenor.com/Uvw2ilLXmnYAAAAj/pixel-heart.gif','https://i.pinimg.com/originals/a9/9e/41/a99e419272b53630b5d5b178188a8900.gif','https://i.pinimg.com/originals/ea/9f/e2/ea9fe22ede2464b8aab30a4028a796a9.gif'];
+    setInterval(()=>{ const e=document.createElement('div'); e.className='floating-gif'; e.style.left=Math.random()*90+'%'; e.style.backgroundImage=`url('${gifs[Math.floor(Math.random()*gifs.length)]}')`; document.body.appendChild(e); e.addEventListener('animationend',()=>e.remove()); },800);
+  </script>
+  <script>
+    // YouTube & 비주얼라이저
+    const tag=document.createElement('script'); tag.src='https://www.youtube.com/iframe_api'; document.head.appendChild(tag);
+    let player, bars=[];
+    function initVisualizer(){ const v=document.getElementById('visualizer'); for(let i=0;i<20;i++){ const b=document.createElement('div'); b.className='bar'; v.appendChild(b); bars.push(b);} }
+    function onYouTubeIframeAPIReady(){ player=new YT.Player('player',{ playerVars:{listType:'playlist',list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',autoplay:0,controls:0,loop:1,modestbranding:1,origin:location.origin}, events:{onReady:()=>initVisualizer(), onStateChange:onStateChange} }); }
+    let iv;
+    function onStateChange(e){ clearInterval(iv); if(e.data===YT.PlayerState.PLAYING){ iv=setInterval(()=>{ bars.forEach(b=>b.style.height=Math.random()*100+'%'); },100);} else { bars.forEach(b=>b.style.height='0%'); }}
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.getElementById('play').onclick=()=>{ const s=player.getPlayerState(); s===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo(); };
+      document.getElementById('prev').onclick=()=>player.previousVideo();
+      document.getElementById('next').onclick=()=>player.nextVideo();
+            // Firebase 설정 값
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcNEZGmBSH3U_RlvmAOXYFHbW7dzzbFDE",
+        authDomain: "vapor-71b36.firebaseapp.com",
+        databaseURL: "https://vapor-71b36-default-rtdb.firebaseio.com",
+        projectId: "vapor-71b36",
+        storageBucket: "vapor-71b36.appspot.com",
+        messagingSenderId: "344956365850",
+        appId: "1:344956365850:web:51ca717cc8dda9838bb5a3"
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      // Realtime Database 채팅 레퍼런스      // 채팅 DB 레퍼런스
+      firebase.initializeApp(cfg);
+      const db=firebase.database().ref('chat');
+      db.on('child_added',snap=>{ const m=snap.val(); const d=document.createElement('div'); d.textContent=m; document.getElementById('chat').appendChild(d); document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight; });
+      document.getElementById('send-btn').onclick=()=>{ const v=document.getElementById('chat-input').value; if(v){ db.push(v); document.getElementById('chat-input').value=''; }};
     });
   </script>
 </body>
