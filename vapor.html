@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Vaporwave Synthwave Site</title>
+  <!-- 루트 경로 접속 시 vapor.html로 리다이렉트 -->
+  <script>
+    if (!window.location.pathname.includes('.html')) {
+      window.location.href = window.location.pathname + 'vapor.html';
+    }
+  </script>
   <!-- Pixel Font 추가 -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
