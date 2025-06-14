@@ -149,8 +149,31 @@
     });
     // YouTube player and controls
     let player;
-    function onYouTubeIframeAPIReady(){
-      player=new YT.Player('player',{playerVars:{listType:'playlist',list:'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',autoplay:0,controls:0,loop:1,modestbranding:1,origin:location.origin},events:{onReady:function(){document.getElementById('play').onclick=()=>{const s=player.getPlayerState();s===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();};document.getElementById('prev').onclick=()=>player.previousVideo();document.getElementById('next').onclick=()=>player.nextVideo();}}});
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        playerVars: {
+          listType: 'playlist',
+          list: 'PLGa3uxog5E0tb8WmX0STOZRgLZAZX-rAk',
+          autoplay: 1,
+          controls: 0,
+          loop: 1,
+          modestbranding: 1,
+          origin: location.origin
+        },
+        events: {
+          onReady: function() {
+            player.mute();
+            player.playVideo();
+            document.getElementById('play').onclick = function() {
+              const state = player.getPlayerState();
+              if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+              else player.playVideo();
+            };
+            document.getElementById('prev').onclick = function() { player.previousVideo(); };
+            document.getElementById('next').onclick = function() { player.nextVideo(); };
+          }
+        }
+      });
     }
     // Mini Game logic
     document.addEventListener('DOMContentLoaded',()=>{
